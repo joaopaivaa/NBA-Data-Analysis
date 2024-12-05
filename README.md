@@ -1,1 +1,3 @@
-Development of an NBA Data Analysis Code
+(In process)
+
+Developing a NBA data analysis code. Input: player name. Output: full stats report about him.
