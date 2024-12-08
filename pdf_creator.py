@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as patches
 
-from functions import scrape_player_image, get_player_info, moving_avg
+from functions import scrape_player_image, get_player_info, moving_avg, rank_analysis
 
 player_name = 'Draymond Green'
 
@@ -49,6 +49,12 @@ with PdfPages(pdf_name) as pdf:
     plt.text(0.5, 1, 'Defense Stats - Rank', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     plt.gca().set_axis_off()
 
+    pag2 = plt.figure(figsize=(8.5, 11))
+    gs = gridspec.GridSpec(5, 4)
+
+    ax = pag2.add_subplot(gs[1:5, 0])
+    rank_analysis('PTS', ax, player_name)
+
     pdf.savefig()
     plt.close()
 
@@ -56,9 +62,9 @@ with PdfPages(pdf_name) as pdf:
     # Third page
 
     pag2 = plt.figure(figsize=(8.5, 11))
-
-    plt.text(0.5, 1, 'Defense Stats - Rank', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     gs = gridspec.GridSpec(7, 2)
+
+    plt.text(0.5, 1, 'Defense Stats - Over Time', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     ax = pag2.add_subplot(gs[0, :])
     ax.set_axis_off()
 

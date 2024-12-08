@@ -8,68 +8,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 season = "2024-25"
 
-def moving_avg_off(season, player_name: str = None):
-
-    '''
-    If a player name is informed, it returns his moving average chart.
-    '''
-
-    from datasets import players_stats_df
-
-    pdf_name = f'{player_name}.pdf'
-
-    if (player_name != None):
-
-        players_dict = players.get_players()
-        player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
-        player_id = player['id'] if player else None
-
-        with PdfPages(pdf_name) as pdf:
-
-            for i in range(len(players_stats_df)):
-
-                game_log = PlayerGameLog(player_id=player_id, season=season, season_type_all_star="Regular Season")
-
-                data = game_log.get_data_frames()[0]
-                data = data.sort_index(ascending=False).reset_index(drop=True)
-                data['GAME_DATE'] = pd.to_datetime(data['GAME_DATE'])
-
-                window_size = 10
-                for column in data.columns[6:-2]:
-                    data[f'{column}_Moving_Avg'] = data[column].rolling(window=window_size).mean()
-                data['PLUS_MINUS_Moving_Sum'] = data['PLUS_MINUS'].rolling(window=window_size).sum()
-
-                column = 0
-                row = 0
-                columns = ['PTS','AST','REB','STL','BLK','TOV']
-                fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(18,9))
-                for i in range(len(columns)):
-                    last_avg = round(data[f'{columns[i]}_Moving_Avg'].iloc[-1],2)
-                    mean = round(data[columns[i]].mean(),2)
-                    perc_above = round(100*len(data[data[columns[i]] > mean]) / len(data), 2)
-                    perc_under = round(100*len(data[data[columns[i]] < mean]) / len(data), 2)
-                    perc_diff = round(100*(last_avg-mean)/mean, 2)
-                    ax[row,column].set_title(columns[i])
-                    ax[row,column].set_ylim(0, max(data[columns[i]])*1.1)
-                    ax[row,column].tick_params(axis='x', size=6)
-                    ax[row,column].tick_params(axis='y', size=6)
-                    ax[row,column].xaxis.set_major_locator(mdates.MonthLocator())
-                    ax[row,column].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-                    ax[row,column].scatter(data['GAME_DATE'], data[columns[i]], color='gray', alpha=0.5, label=columns[i])
-                    ax[row,column].plot(data['GAME_DATE'], data[f'{columns[i]}_Moving_Avg'], color='blue', label=f'Moving Average: {last_avg} ({perc_diff}%)')
-                    ax[row,column].axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
-                    ax[row,column].plot([], [], label=f'Above mean: {perc_above}%')
-                    ax[row,column].plot([], [], label=f'Under mean: {perc_under}%')
-                    ax[row,column].legend(fontsize=7)
-                    if i % 2 == 0:
-                        row = 1
-                    else:
-                        row = 0
-                        column += 1
-                plt.suptitle(f'{window_size} Games Moving Average')
-                plt.tight_layout()
-                pdf.savefig()
-
 def moving_avg(season, stats_list, pdf, pag, gs, player_name: str = None):
 
     from datasets import games_df
@@ -123,6 +61,31 @@ def moving_avg(season, stats_list, pdf, pag, gs, player_name: str = None):
         plt.tight_layout()
         pdf.savefig(pag)
         plt.close(pag)
+
+def rank_analysis(stat, ax, player_name):
+
+    from datasets import players_df
+
+    players_dict = players.get_players()
+    player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
+    player_id = player['id'] if player else None
+
+    if (player_id != None):
+
+        data_players = players_df[players_df['PLAYER_ID'] != player_id].reset_index(drop=True)
+        data_player = players_df[players_df['PLAYER_ID'] == player_id].reset_index(drop=True)
+
+        ax.set_title(stat)
+        ax.tick_params(axis='x', size=6)
+        ax.tick_params(axis='y', size=6)
+        ax.scatter([0] * len(data_players), data_players['PTS'], color='gray', alpha=0.5)
+        ax.scatter([0], data_player['PTS'], color='red', alpha=0.5, s=50)
+        ax.spines['left'].set_visible(True)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.set_xticklabels([])
+        ax.tick_params(bottom=False)
 
 def usg_ts_plot(season, player_name: str = None):
 
