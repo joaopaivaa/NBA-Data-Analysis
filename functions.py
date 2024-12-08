@@ -1,4 +1,4 @@
-from nba_api.stats.endpoints import PlayerGameLog
+from nba_api.stats.endpoints import PlayerGameLog, PlayerEstimatedMetrics, PlayerGameLogs
 from nba_api.stats.static import players
 
 import matplotlib.pyplot as plt
@@ -8,13 +8,13 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 season = "2024-25"
 
-def moving_avg_analysis(season, player_name: str = None):
+def moving_avg_off(season, player_name: str = None):
 
     '''
     If a player name is informed, it returns his moving average chart.
     '''
 
-    from all_players_data import players_stats_df
+    from datasets import players_stats_df
 
     pdf_name = f'{player_name}.pdf'
 
@@ -70,13 +70,67 @@ def moving_avg_analysis(season, player_name: str = None):
                 plt.tight_layout()
                 pdf.savefig()
 
+def moving_avg(season, stats_list, pdf, pag, gs, player_name: str = None):
+
+    from datasets import games_df
+
+    '''
+    If a player name is informed, it returns his moving average chart.
+    '''
+
+    players_dict = players.get_players()
+    player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
+    player_id = player['id'] if player else None
+
+    if (player_id != None):
+
+        data = games_df
+        data['GAME_DATE'] = pd.to_datetime(data['GAME_DATE'])
+        data = data[data['PLAYER_ID'] == player_id]
+
+        window_size = 10
+        for column in stats_list:
+            data[f'{column}_Moving_Avg'] = data[column].rolling(window=window_size).mean()
+
+        column = 0
+        row = 1
+        for i in range(len(stats_list)):
+            
+            ax = pag.add_subplot(gs[row:row+2, column])
+
+            last_avg = round(data[f'{stats_list[i]}_Moving_Avg'].iloc[-1],2)
+            mean = round(data[stats_list[i]].mean(),2)
+            perc_above = round(100*len(data[data[stats_list[i]] > mean]) / len(data), 2)
+            perc_under = round(100*len(data[data[stats_list[i]] < mean]) / len(data), 2)
+            perc_diff = round(100*(last_avg-mean)/mean, 2)
+            ax.set_title(stats_list[i])
+            ax.set_ylim(0, max(data[stats_list[i]])*1.1)
+            ax.tick_params(axis='x', size=6)
+            ax.tick_params(axis='y', size=6)
+            ax.xaxis.set_major_locator(mdates.MonthLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+            ax.scatter(data['GAME_DATE'], data[stats_list[i]], color='gray', alpha=0.5, s=10)
+            ax.plot(data['GAME_DATE'], data[f'{stats_list[i]}_Moving_Avg'], color='blue', label=f'Moving Average: {last_avg} ({perc_diff}%)')
+            ax.axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
+            ax.plot([], [], label=f'Above mean: {perc_above}%')
+            ax.plot([], [], label=f'Under mean: {perc_under}%')
+            ax.legend(fontsize=7)
+            if i % 2 == 0:
+                column = 1
+            else:
+                column = 0
+                row += 2
+        plt.tight_layout()
+        pdf.savefig(pag)
+        plt.close(pag)
+
 def usg_ts_plot(season, player_name: str = None):
 
     '''
     If a player name is informed, it returns his USG vs TS chart.
     '''
 
-    from all_players_data import players_advanced_stats_df
+    from datasets import players_advanced_stats_df
 
     pdf_name = f'{player_name}.pdf'
 
@@ -106,7 +160,7 @@ def usg_ts_plot(season, player_name: str = None):
 
 def off_def_rating_plot(season, player_name: str = None):
 
-    from all_players_data import players_advanced_stats_df
+    from datasets import players_advanced_stats_df
 
     pdf_name = f'{player_name}.pdf'
 
@@ -168,7 +222,7 @@ def get_player_info(player_name):
     players_dict = players.get_players()
     player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
     player_id = player['id'] if player else None
-    
+
     if player_id:
         player_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
         data = player_info.get_normalized_dict()
