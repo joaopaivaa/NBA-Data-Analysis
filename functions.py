@@ -48,7 +48,7 @@ def moving_avg(stat, ax, player_name: str = None):
         ax.axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
         ax.plot([], [], label=f'Above mean: {perc_above}%')
         ax.plot([], [], label=f'Under mean: {perc_under}%')
-        ax.legend(fontsize=7)
+        ax.legend(fontsize=7, loc='upper left')
 
 def rank_analysis(stat, ax, player_name: str = None):
 
