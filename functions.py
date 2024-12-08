@@ -1,6 +1,4 @@
 from nba_api.stats.endpoints import PlayerGameLog, PlayerEstimatedMetrics, PlayerGameLogs
-from nba_api.stats.static import players
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
@@ -8,17 +6,21 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 season = "2024-25"
 
-def moving_avg(season, stats_list, pdf, pag, gs, player_name: str = None):
+def get_player_id(player_name: str = None):
 
-    from datasets import games_df
-
-    '''
-    If a player name is informed, it returns his moving average chart.
-    '''
+    from nba_api.stats.static import players
 
     players_dict = players.get_players()
     player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
     player_id = player['id'] if player else None
+
+    return player_id
+
+def moving_avg(stat, ax, player_name: str = None):
+
+    from datasets import games_df
+
+    player_id = get_player_id(player_name)
 
     if (player_id != None):
 
@@ -27,53 +29,37 @@ def moving_avg(season, stats_list, pdf, pag, gs, player_name: str = None):
         data = data[data['PLAYER_ID'] == player_id]
 
         window_size = 10
-        for column in stats_list:
-            data[f'{column}_Moving_Avg'] = data[column].rolling(window=window_size).mean()
+        data[f'{stat}_Moving_Avg'] = data[stat].rolling(window=window_size).mean()
 
-        column = 0
-        row = 1
-        for i in range(len(stats_list)):
-            
-            ax = pag.add_subplot(gs[row:row+2, column])
+        last_avg = round(data[f'{stat}_Moving_Avg'].iloc[-1], 2)
+        mean = round(data[stat].mean(), 2)
+        perc_above = round(100*len(data[data[stat] > mean]) / len(data), 2)
+        perc_under = round(100*len(data[data[stat] < mean]) / len(data), 2)
+        perc_diff = round(100*(last_avg-mean)/mean, 2)
 
-            last_avg = round(data[f'{stats_list[i]}_Moving_Avg'].iloc[-1],2)
-            mean = round(data[stats_list[i]].mean(),2)
-            perc_above = round(100*len(data[data[stats_list[i]] > mean]) / len(data), 2)
-            perc_under = round(100*len(data[data[stats_list[i]] < mean]) / len(data), 2)
-            perc_diff = round(100*(last_avg-mean)/mean, 2)
-            ax.set_title(stats_list[i])
-            ax.set_ylim(0, max(data[stats_list[i]])*1.1)
-            ax.tick_params(axis='x', size=6)
-            ax.tick_params(axis='y', size=6)
-            ax.xaxis.set_major_locator(mdates.MonthLocator())
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-            ax.scatter(data['GAME_DATE'], data[stats_list[i]], color='gray', alpha=0.5, s=10)
-            ax.plot(data['GAME_DATE'], data[f'{stats_list[i]}_Moving_Avg'], color='blue', label=f'Moving Average: {last_avg} ({perc_diff}%)')
-            ax.axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
-            ax.plot([], [], label=f'Above mean: {perc_above}%')
-            ax.plot([], [], label=f'Under mean: {perc_under}%')
-            ax.legend(fontsize=7)
-            if i % 2 == 0:
-                column = 1
-            else:
-                column = 0
-                row += 2
-        plt.tight_layout()
-        pdf.savefig(pag)
-        plt.close(pag)
+        ax.set_title(stat)
+        ax.set_ylim(0, max(data[stat])*1.1)
+        ax.tick_params(axis='x', size=6)
+        ax.tick_params(axis='y', size=6)
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+        ax.scatter(data['GAME_DATE'], data[stat], color='gray', alpha=0.5, s=10)
+        ax.plot(data['GAME_DATE'], data[f'{stat}_Moving_Avg'], color='blue', label=f'Moving Average: {last_avg} ({perc_diff}%)')
+        ax.axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
+        ax.plot([], [], label=f'Above mean: {perc_above}%')
+        ax.plot([], [], label=f'Under mean: {perc_under}%')
+        ax.legend(fontsize=7)
 
-def rank_analysis(stat, ax, player_name):
+def rank_analysis(stat, ax, player_name: str = None):
 
     from datasets import players_df
 
-    players_dict = players.get_players()
-    player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
-    player_id = player['id'] if player else None
+    player_id = get_player_id(player_name)
 
     if (player_id != None):
 
         players_df = players_df[players_df['GP_x'] > players_df['GP_x'].max()/2].reset_index(drop=True)
-        
+
         data_players = players_df[players_df['PLAYER_ID'] != player_id].reset_index(drop=True)
         data_player = players_df[players_df['PLAYER_ID'] == player_id].reset_index(drop=True)
 
@@ -103,9 +89,7 @@ def usg_ts_plot(season, player_name: str = None):
 
     if (player_name != None):
 
-        players_dict = players.get_players()
-        player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
-        player_id = player['id'] if player else None
+        player_id = get_player_id(player_name)
 
         with PdfPages(pdf_name) as pdf:
 
@@ -133,9 +117,7 @@ def off_def_rating_plot(season, player_name: str = None):
 
     if (player_name != None):
 
-        players_dict = players.get_players()
-        player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
-        player_id = player['id'] if player else None
+        player_id = get_player_id(player_name)
 
         with PdfPages(pdf_name) as pdf:
 
@@ -186,9 +168,7 @@ def get_player_info(player_name):
 
     from nba_api.stats.endpoints import commonplayerinfo
 
-    players_dict = players.get_players()
-    player = next((player for player in players_dict if player['full_name'].lower() == player_name.lower()), None)
-    player_id = player['id'] if player else None
+    player_id = get_player_id(player_name)
 
     if player_id:
         player_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
