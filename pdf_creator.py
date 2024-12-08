@@ -44,16 +44,24 @@ with PdfPages(pdf_name) as pdf:
     #########################################
     # Second page
 
-    plt.figure(figsize=(8.5, 11))
+    pag2 = plt.figure(figsize=(8.5, 11))
+
+    gs = gridspec.GridSpec(6, 4)
 
     plt.text(0.5, 1, 'Defense Stats - Rank', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     plt.gca().set_axis_off()
 
-    pag2 = plt.figure(figsize=(8.5, 11))
-    gs = gridspec.GridSpec(5, 4)
+    ax = pag2.add_subplot(gs[1:, 0])
+    rank_analysis('REB', ax, player_name)
 
-    ax = pag2.add_subplot(gs[1:5, 0])
-    rank_analysis('PTS', ax, player_name)
+    ax = pag2.add_subplot(gs[1:, 1])
+    rank_analysis('STL', ax, player_name)
+
+    ax = pag2.add_subplot(gs[1:, 2])
+    rank_analysis('BLK', ax, player_name)
+
+    ax = pag2.add_subplot(gs[1:, 3])
+    rank_analysis('PF', ax, player_name)
 
     pdf.savefig()
     plt.close()
