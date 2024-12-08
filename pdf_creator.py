@@ -102,10 +102,55 @@ with PdfPages(pdf_name) as pdf:
     # Fourth page
 
     pag = plt.figure(figsize=(8.5, 11))
-    gs = gridspec.GridSpec(9, 2)
 
-    ax1 = pag.add_subplot(gs[0, :])
-    ax1.text(0.5, 1, 'Defense Stats', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
+    gs = gridspec.GridSpec(10, 4)
 
-    pdf.savefig(pag)
-    plt.close(pag)
+    plt.text(0.5, 1, 'Offense Stats - Rank', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
+    plt.gca().set_axis_off()
+
+    ax = pag.add_subplot(gs[1:, 0])
+    rank_analysis('PTS', ax, player_name)
+
+    ax = pag.add_subplot(gs[1:, 1])
+    rank_analysis('AST', ax, player_name)
+
+    ax = pag.add_subplot(gs[1:, 2])
+    rank_analysis('TOV', ax, player_name)
+
+    ax = pag.add_subplot(gs[1:, 3])
+    rank_analysis('FG_PCT', ax, player_name)
+
+    pdf.savefig()
+    plt.close()
+
+    #########################################
+    # Fifth page
+
+    pag = plt.figure(figsize=(8.5, 11))
+    gs = gridspec.GridSpec(10, 2)
+
+    plt.text(0.5, 1, 'Offense Stats - Over Time', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
+    plt.gca().set_axis_off()
+
+    ax = pag.add_subplot(gs[1:4, 0])
+    moving_avg('PTS', ax, player_name)
+
+    ax = pag.add_subplot(gs[1:4, 1])
+    moving_avg('AST', ax, player_name)
+
+    ax = pag.add_subplot(gs[4:7, 0])
+    moving_avg('TOV', ax, player_name)
+
+    ax = pag.add_subplot(gs[4:7, 1])
+    moving_avg('FG_PCT', ax, player_name)
+
+    ax = pag.add_subplot(gs[7:, 0])
+    moving_avg('FG3_PCT', ax, player_name)
+
+    ax = pag.add_subplot(gs[7:, 1])
+    moving_avg('FT_PCT', ax, player_name)
+
+    plt.subplots_adjust(hspace=0.8, wspace=0.2)
+
+    pdf.savefig()
+    plt.close()

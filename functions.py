@@ -58,17 +58,20 @@ def rank_analysis(stat, ax, player_name: str = None):
 
     if (player_id != None):
 
-        players_df = players_df[players_df['GP_x'] > players_df['GP_x'].max()/2].reset_index(drop=True)
+        players_df = players_df[players_df['GP'] > players_df['GP'].max()/2].reset_index(drop=True)
 
         data_players = players_df[players_df['PLAYER_ID'] != player_id].reset_index(drop=True)
         data_player = players_df[players_df['PLAYER_ID'] == player_id].reset_index(drop=True)
 
-        ax.set_title(f'{stat}: {data_player[f"{stat}_RANK"].values[0]}º - {data_player[stat].values[0]}')
-        ax.tick_params(axis='x', size=6)
-        ax.tick_params(axis='y', size=6)
+        if 'PCT' in stat:
+            ax.set_title(f'{stat.split("_")[0]}: {data_player[f"{stat}_RANK"].values[0]}º - {round(100*data_player[stat].values[0], 2)}%')
+        else:
+            ax.set_title(f'{stat}: {data_player[f"{stat}_RANK"].values[0]}º - {data_player[stat].values[0]}')
         ax.scatter([0] * len(data_players), data_players[stat], color='gray', alpha=0.3)
         ax.scatter([0], data_player[stat], color='red', s=150, marker='*')
         ax.scatter([0], players_df[stat].mean(), color='blue', s=200, marker='_')
+        ax.tick_params(axis='x', size=6)
+        ax.tick_params(axis='y', size=6)
         ax.spines['left'].set_visible(True)
         ax.spines['bottom'].set_visible(False)
         ax.spines['right'].set_visible(False)
