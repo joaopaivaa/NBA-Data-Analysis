@@ -36,6 +36,7 @@ def moving_avg(stat, ax, player_name: str = None):
         perc_above = round(100*len(data[data[stat] > mean]) / len(data), 2)
         perc_under = round(100*len(data[data[stat] < mean]) / len(data), 2)
         perc_diff = round(100*(last_avg-mean)/mean, 2)
+        perc_diff_str = '+' + str(perc_diff) if perc_diff >= 0 else '-' + str(perc_diff)
 
         ax.set_title(stat)
         ax.set_ylim(0, max(data[stat])*1.1)
@@ -44,11 +45,19 @@ def moving_avg(stat, ax, player_name: str = None):
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
         ax.scatter(data['GAME_DATE'], data[stat], color='gray', alpha=0.5, s=10)
-        ax.plot(data['GAME_DATE'], data[f'{stat}_Moving_Avg'], color='blue', label=f'Moving Average: {last_avg} ({perc_diff}%)')
-        ax.axhline(mean, color='red', alpha=0.5, ls='--', label=f'Mean: {mean}')
-        ax.plot([], [], label=f'Above mean: {perc_above}%')
-        ax.plot([], [], label=f'Under mean: {perc_under}%')
-        ax.legend(fontsize=7, loc='upper left')
+
+        ax.plot(data['GAME_DATE'], data[f'{stat}_Moving_Avg'], color='blue')
+        ax.axhline(mean, color='red', alpha=0.5, ls='--')
+
+        if perc_diff >= 0:
+            ax.text(data['GAME_DATE'].values[-1], 1.1*data[f'{stat}_Moving_Avg'].max(), f'Mov Avg: {last_avg} ({perc_diff_str}%)', fontsize=8, ha='right', va='bottom', color='blue')
+            ax.text(data['GAME_DATE'].values[-1], 0.9*data[f'{stat}_Moving_Avg'].min(), f'Mean: {mean}', fontsize=8, ha='right', va='top', color='red', alpha=0.5)
+        else:
+            ax.text(data['GAME_DATE'].values[-1], 0.9*data[f'{stat}_Moving_Avg'].min(), f'Mov Avg: {last_avg} ({perc_diff_str}%)', fontsize=8, ha='right', va='top', color='blue')
+            ax.text(data['GAME_DATE'].values[-1], 1.1*data[f'{stat}_Moving_Avg'].max(), f'Mean: {mean}', fontsize=8, ha='right', va='bottom', color='red', alpha=0.5)
+        
+        ax.text(data['GAME_DATE'].values[0], 1.05*mean, f'{perc_above}% above', fontsize=8, ha='left', va='bottom', color='red', alpha=0.5)
+        ax.text(data['GAME_DATE'].values[0], 0.95*mean, f'{perc_under}% under', fontsize=8, ha='left', va='top', color='red', alpha=0.5)
 
 def rank_analysis(stat, ax, player_name: str = None):
 

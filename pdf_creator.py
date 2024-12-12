@@ -70,28 +70,34 @@ with PdfPages(pdf_name) as pdf:
     # Third page
 
     pag = plt.figure(figsize=(8.5, 11))
-    gs = gridspec.GridSpec(10, 2)
+    gs = gridspec.GridSpec(11, 2)
 
     plt.text(0.5, 1, 'Defense Stats - Over Time', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     plt.gca().set_axis_off()
 
-    ax = pag.add_subplot(gs[1:4, 0])
+    ax = pag.add_subplot(gs[2:5, 0])
     moving_avg('REB', ax, player_name)
 
-    ax = pag.add_subplot(gs[1:4, 1])
+    ax = pag.add_subplot(gs[2:5, 1])
     moving_avg('OREB', ax, player_name)
 
-    ax = pag.add_subplot(gs[4:7, 0])
+    ax = pag.add_subplot(gs[5:8, 0])
     moving_avg('DREB', ax, player_name)
 
-    ax = pag.add_subplot(gs[4:7, 1])
+    ax = pag.add_subplot(gs[5:8, 1])
     moving_avg('STL', ax, player_name)
 
-    ax = pag.add_subplot(gs[7:, 0])
+    ax = pag.add_subplot(gs[8:, 0])
     moving_avg('BLK', ax, player_name)
 
-    ax = pag.add_subplot(gs[7:, 1])
+    ax = pag.add_subplot(gs[8:, 1])
     moving_avg('PF', ax, player_name)
+
+    handles = [plt.Line2D([], [], color='blue', ls='solid', label=f'10 days Moving Average'),
+               plt.Line2D([], [], color='red', alpha=0.5, ls='--', label=f'Average')]
+    ax = pag.add_subplot(gs[1:2, 0:])
+    ax.legend(handles=handles, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
+    ax.set_axis_off()
 
     plt.subplots_adjust(hspace=0.8, wspace=0.2)
 
@@ -127,28 +133,34 @@ with PdfPages(pdf_name) as pdf:
     # Fifth page
 
     pag = plt.figure(figsize=(8.5, 11))
-    gs = gridspec.GridSpec(10, 2)
+    gs = gridspec.GridSpec(11, 2)
 
     plt.text(0.5, 1, 'Offense Stats - Over Time', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
     plt.gca().set_axis_off()
 
-    ax = pag.add_subplot(gs[1:4, 0])
+    ax = pag.add_subplot(gs[2:5, 0])
     moving_avg('PTS', ax, player_name)
 
-    ax = pag.add_subplot(gs[1:4, 1])
+    ax = pag.add_subplot(gs[2:5, 1])
     moving_avg('AST', ax, player_name)
 
-    ax = pag.add_subplot(gs[4:7, 0])
+    ax = pag.add_subplot(gs[5:8, 0])
     moving_avg('TOV', ax, player_name)
 
-    ax = pag.add_subplot(gs[4:7, 1])
+    ax = pag.add_subplot(gs[5:8, 1])
     moving_avg('FG_PCT', ax, player_name)
 
-    ax = pag.add_subplot(gs[7:, 0])
+    ax = pag.add_subplot(gs[8:, 0])
     moving_avg('FG3_PCT', ax, player_name)
 
-    ax = pag.add_subplot(gs[7:, 1])
+    ax = pag.add_subplot(gs[8:, 1])
     moving_avg('FT_PCT', ax, player_name)
+
+    handles = [plt.Line2D([], [], color='blue', ls='solid', label=f'10 days Moving Average'),
+               plt.Line2D([], [], color='red', alpha=0.5, ls='--', label=f'Average')]
+    ax = pag.add_subplot(gs[1:2, 0:])
+    ax.legend(handles=handles, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
+    ax.set_axis_off()
 
     plt.subplots_adjust(hspace=0.8, wspace=0.2)
 
