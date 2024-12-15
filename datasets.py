@@ -48,6 +48,9 @@ def get_players_df(season):
 ####################################
 # carreer_df
 
-def get_carreer_df(player_id):
-    career = PlayerCareerStats(player_id=player_id)
+def get_career_df(player_id):
+
+    career = PlayerCareerStats(player_id=player_id, per_mode36='PerGame')
     career_df = career.get_data_frames()[0]
+
+    return career_df

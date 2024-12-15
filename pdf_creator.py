@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as patches
 
-from functions import scrape_player_image, get_player_info, moving_avg, rank_analysis
+from functions import scrape_player_image, get_player_info, moving_avg, rank_analysis, career_analysis
 
 season = '2024-25'
 
@@ -82,8 +82,14 @@ with PdfPages(pdf_name) as pdf:
     ax = pag.add_subplot(gs[1:6, 0])
     rank_analysis(season, 'REB', ax, player_name)
 
-    ax = pag.add_subplot(gs[6:, 0:])
+    ax = pag.add_subplot(gs[6:8, 0:])
     moving_avg(season, 'REB', ax, player_name)
+
+    ax = pag.add_subplot(gs[8:, 0:])
+    career_analysis('REB', ax, player_name)
+
+    pag.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
+    pag.tight_layout()
 
     pdf.savefig()
     plt.close()

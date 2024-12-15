@@ -88,6 +88,33 @@ def rank_analysis(season, stat, ax, player_name: str = None):
         ax.tick_params(bottom=False)
         ax.grid(True, axis='y', linestyle='dashed', linewidth=0.5)
 
+def career_analysis(stat, ax, player_name: str = None):
+
+    from datasets import get_career_df
+
+    player_id = get_player_id(player_name)
+
+    if (player_id != None):
+
+        data = get_career_df(player_id)
+
+        mean = data[stat].mean()
+
+        ax.set_title(stat)
+        ax.set_ylim(0, max(data[stat])*1.1)
+        ax.tick_params(axis='x', size=6)
+        ax.tick_params(axis='y', size=6)
+        ax.scatter(data['SEASON_ID'], data[stat], color='blue')
+        ax.plot(data['SEASON_ID'], data[f'{stat}'], color='blue')
+        ax.axhline(mean, color='red', alpha=0.5, ls='--')
+
+
+
+
+
+
+
+
 def usg_ts_plot(season, player_name: str = None):
 
     '''
