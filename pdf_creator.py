@@ -5,6 +5,8 @@ import matplotlib.patches as patches
 
 from functions import scrape_player_image, get_player_info, moving_avg, rank_analysis
 
+season = '2024-25'
+
 player_name = 'Draymond Green'
 
 player_info = get_player_info(player_name)
@@ -41,6 +43,7 @@ with PdfPages(pdf_name) as pdf:
     pdf.savefig(pag)
     plt.close(pag)
 
+    ##################################
     #########################################
     # Second page
 
@@ -52,16 +55,35 @@ with PdfPages(pdf_name) as pdf:
     plt.gca().set_axis_off()
 
     ax = pag.add_subplot(gs[1:, 0])
-    rank_analysis('REB', ax, player_name)
+    rank_analysis(season, 'REB', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 1])
-    rank_analysis('STL', ax, player_name)
+    rank_analysis(season, 'STL', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 2])
-    rank_analysis('BLK', ax, player_name)
+    rank_analysis(season, 'BLK', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 3])
-    rank_analysis('PF', ax, player_name)
+    rank_analysis(season, 'PF', ax, player_name)
+
+    pdf.savefig()
+    plt.close()
+
+    #########################################
+    # Second page
+
+    pag = plt.figure(figsize=(8.5, 11))
+
+    gs = gridspec.GridSpec(10, 2)
+
+    plt.text(0.5, 1, 'Defense Stats - Rank', fontsize=24, fontname='Times New Roman', color='black', horizontalalignment='center', fontweight='bold')
+    plt.gca().set_axis_off()
+
+    ax = pag.add_subplot(gs[1:6, 0])
+    rank_analysis(season, 'REB', ax, player_name)
+
+    ax = pag.add_subplot(gs[6:, 0:])
+    moving_avg(season, 'REB', ax, player_name)
 
     pdf.savefig()
     plt.close()
@@ -76,22 +98,22 @@ with PdfPages(pdf_name) as pdf:
     plt.gca().set_axis_off()
 
     ax = pag.add_subplot(gs[2:5, 0])
-    moving_avg('REB', ax, player_name)
+    moving_avg(season, 'REB', ax, player_name)
 
     ax = pag.add_subplot(gs[2:5, 1])
-    moving_avg('OREB', ax, player_name)
+    moving_avg(season, 'OREB', ax, player_name)
 
     ax = pag.add_subplot(gs[5:8, 0])
-    moving_avg('DREB', ax, player_name)
+    moving_avg(season, 'DREB', ax, player_name)
 
     ax = pag.add_subplot(gs[5:8, 1])
-    moving_avg('STL', ax, player_name)
+    moving_avg(season, 'STL', ax, player_name)
 
     ax = pag.add_subplot(gs[8:, 0])
-    moving_avg('BLK', ax, player_name)
+    moving_avg(season, 'BLK', ax, player_name)
 
     ax = pag.add_subplot(gs[8:, 1])
-    moving_avg('PF', ax, player_name)
+    moving_avg(season, 'PF', ax, player_name)
 
     handles = [plt.Line2D([], [], color='blue', ls='solid', label=f'10 days Moving Average'),
                plt.Line2D([], [], color='red', alpha=0.5, ls='--', label=f'Average')]
@@ -115,16 +137,16 @@ with PdfPages(pdf_name) as pdf:
     plt.gca().set_axis_off()
 
     ax = pag.add_subplot(gs[1:, 0])
-    rank_analysis('PTS', ax, player_name)
+    rank_analysis(season, 'PTS', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 1])
-    rank_analysis('AST', ax, player_name)
+    rank_analysis(season, 'AST', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 2])
-    rank_analysis('TOV', ax, player_name)
+    rank_analysis(season, 'TOV', ax, player_name)
 
     ax = pag.add_subplot(gs[1:, 3])
-    rank_analysis('FG_PCT', ax, player_name)
+    rank_analysis(season, 'FG_PCT', ax, player_name)
 
     pdf.savefig()
     plt.close()
@@ -139,22 +161,22 @@ with PdfPages(pdf_name) as pdf:
     plt.gca().set_axis_off()
 
     ax = pag.add_subplot(gs[2:5, 0])
-    moving_avg('PTS', ax, player_name)
+    moving_avg(season, 'PTS', ax, player_name)
 
     ax = pag.add_subplot(gs[2:5, 1])
-    moving_avg('AST', ax, player_name)
+    moving_avg(season, 'AST', ax, player_name)
 
     ax = pag.add_subplot(gs[5:8, 0])
-    moving_avg('TOV', ax, player_name)
+    moving_avg(season, 'TOV', ax, player_name)
 
     ax = pag.add_subplot(gs[5:8, 1])
-    moving_avg('FG_PCT', ax, player_name)
+    moving_avg(season, 'FG_PCT', ax, player_name)
 
     ax = pag.add_subplot(gs[8:, 0])
-    moving_avg('FG3_PCT', ax, player_name)
+    moving_avg(season, 'FG3_PCT', ax, player_name)
 
     ax = pag.add_subplot(gs[8:, 1])
-    moving_avg('FT_PCT', ax, player_name)
+    moving_avg(season, 'FT_PCT', ax, player_name)
 
     handles = [plt.Line2D([], [], color='blue', ls='solid', label=f'10 days Moving Average'),
                plt.Line2D([], [], color='red', alpha=0.5, ls='--', label=f'Average')]

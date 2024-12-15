@@ -16,17 +16,15 @@ def get_player_id(player_name: str = None):
 
     return player_id
 
-def moving_avg(stat, ax, player_name: str = None):
+def moving_avg(season, stat, ax, player_name: str = None):
 
-    from datasets import games_df
+    from datasets import get_games_df
 
     player_id = get_player_id(player_name)
 
     if (player_id != None):
 
-        data = games_df
-        data['GAME_DATE'] = pd.to_datetime(data['GAME_DATE'])
-        data = data[data['PLAYER_ID'] == player_id]
+        data = get_games_df(season, player_id)
 
         window_size = 10
         data[f'{stat}_Moving_Avg'] = data[stat].rolling(window=window_size).mean()
@@ -59,14 +57,15 @@ def moving_avg(stat, ax, player_name: str = None):
         ax.text(data['GAME_DATE'].values[0], 1.05*mean, f'{perc_above}% above', fontsize=8, ha='left', va='bottom', color='red', alpha=0.5)
         ax.text(data['GAME_DATE'].values[0], 0.95*mean, f'{perc_under}% under', fontsize=8, ha='left', va='top', color='red', alpha=0.5)
 
-def rank_analysis(stat, ax, player_name: str = None):
+def rank_analysis(season, stat, ax, player_name: str = None):
 
-    from datasets import players_df
+    from datasets import get_players_df
 
     player_id = get_player_id(player_name)
 
     if (player_id != None):
 
+        players_df = get_players_df(season)
         players_df = players_df[players_df['GP'] > players_df['GP'].max()/2].reset_index(drop=True)
 
         data_players = players_df[players_df['PLAYER_ID'] != player_id].reset_index(drop=True)
