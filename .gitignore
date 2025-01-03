@@ -1,0 +1,10 @@
+# Ignore all files by default
+*
+
+# Do not ignore specific file types
+!**/*.py
+!**/*.csv
+!**/*.ipynb
+
+# Do not ignore the .gitignore file itself
+!.gitignore
