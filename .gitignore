@@ -1,10 +1,10 @@
-# Ignore all files by default
+# Ignorar todos os arquivos
 *
 
-# Do not ignore specific file types
-!**/*.py
-!**/*.csv
-!**/*.ipynb
+# Não ignorar arquivos .py e .csv em qualquer pasta
+!*.py
+!*.csv
 
-# Do not ignore the .gitignore file itself
-!.gitignore
+# Não ignorar arquivos .py e .csv dentro de subpastas
+!*/**/*.py
+!*/**/*.csv
