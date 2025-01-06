@@ -1,16 +1,17 @@
 from nba_api.stats.endpoints import leaguedashplayerstats, PlayerGameLogs, PlayerCareerStats
 import pandas as pd
+from datetime import date
 
 ####################################
 # games_df
 
-def get_games_df(season, player_id):
+def get_games_df(season):
 
-    game_log_base = PlayerGameLogs(season_nullable=season, season_type_nullable="Regular Season", player_id_nullable=player_id)
+    game_log_base = PlayerGameLogs(season_nullable=season, season_type_nullable="Regular Season")
     game_log_base = game_log_base.get_data_frames()[0]
     game_log_base = game_log_base.sort_index(ascending=False).reset_index(drop=True)
 
-    game_log_advanced = PlayerGameLogs(season_nullable=season, season_type_nullable="Regular Season", player_id_nullable=player_id, measure_type_player_game_logs_nullable='Advanced')
+    game_log_advanced = PlayerGameLogs(season_nullable=season, season_type_nullable="Regular Season", measure_type_player_game_logs_nullable='Advanced')
     game_log_advanced = game_log_advanced.get_data_frames()[0]
     game_log_advanced = game_log_advanced.sort_index(ascending=False).reset_index(drop=True)
 
@@ -22,6 +23,8 @@ def get_games_df(season, player_id):
     games_df.columns = [col.replace('_x', '') if '_x' in col else col for col in games_df.columns]
 
     games_df['GAME_DATE'] = pd.to_datetime(games_df['GAME_DATE'])
+
+    games_df.to_csv(f'NBA Datasets\\2024-25 GameLogs ({date.today().strftime("%d-%m-%Y")}).csv')
 
     return games_df
 
@@ -42,6 +45,8 @@ def get_players_df(season):
     players_df = players_df.drop(columns=columns_with_y)
 
     players_df.columns = [col.replace('_x', '') if '_x' in col else col for col in players_df.columns]
+
+    players_df.to_csv(f'NBA Datasets\\2024-25 Players Stats ({date.today().strftime("%d-%m-%Y")}).csv')
 
     return players_df
 

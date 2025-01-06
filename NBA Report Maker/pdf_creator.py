@@ -88,12 +88,11 @@ with PdfPages(pdf_name) as pdf:
     moving_avg(season, 'REB', ax, player_name)
     time.sleep(1)
 
-    ax = pag.add_subplot(gs[15:, 0:])
+    ax = pag.add_subplot(gs[14:, 0:])
     career_analysis('REB', ax, player_name)
     time.sleep(1)
 
-    pag.subplots_adjust(left=0.10, right=0.95, top=0.95, bottom=0.05)
-    pag.tight_layout()
+    pag.subplots_adjust(left=0.10, right=0.95, top=0.95, bottom=0.05, hspace=0.2)
 
     pdf.savefig()
     plt.close()

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_pdf import PdfPages
+from datetime import date
 
 
 season = "2024-25"
@@ -21,13 +22,15 @@ def get_player_id(player_name: str = None):
 
 def moving_avg(season, stat, ax, player_name: str = None):
 
-    from datasets import get_games_df
-
     player_id = get_player_id(player_name)
 
     if (player_id != None):
 
-        data = get_games_df(season, player_id)
+        try:
+            data = pd.read_csv(f'NBA Datasets\\2024-25 GameLogs ({date.today().strftime("%d-%m-%Y")}).csv')
+        except:
+            from datasets import get_games_df
+            data = get_games_df(season)
 
         window_size = 10
         data[f'{stat}_Moving_Avg'] = data[stat].rolling(window=window_size).mean()
@@ -63,13 +66,16 @@ def moving_avg(season, stat, ax, player_name: str = None):
 
 def rank_analysis(season, stat, ax, player_name: str = None):
 
-    from datasets import get_players_df
-
     player_id = get_player_id(player_name)
 
     if (player_id != None):
 
-        players_df = get_players_df(season)
+        try:
+            players_df = pd.read_csv(f'NBA Datasets\\2024-25 Players Stats ({date.today().strftime("%d-%m-%Y")}).csv')
+        except:
+            from datasets import get_players_df
+            players_df = get_players_df(season)
+            
         players_df = players_df[players_df['GP'] > players_df['GP'].max()/2].reset_index(drop=True)
 
         data_players = players_df[players_df['PLAYER_ID'] != player_id].reset_index(drop=True)
@@ -93,7 +99,6 @@ def rank_analysis(season, stat, ax, player_name: str = None):
             ax.text(-50, data_player[stat], f'{round(100*data_player[stat].values[0], 2)}%', fontsize=10, ha='left', va='center', color='red', alpha=0.5)
         else:
             ax.text(-50, data_player[stat], f'{data_player[stat].values[0]}', fontsize=10, ha='left', va='center', color='red', alpha=0.5)
-
 
 
 def career_analysis(stat, ax, player_name: str = None):
