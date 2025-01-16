@@ -103,13 +103,15 @@ def rank_analysis(season, stat, ax, player_name: str = None):
 
 def career_analysis(stat, ax, player_name: str = None):
 
-    from datasets import get_career_df
-
     player_id = get_player_id(player_name)
 
     if (player_id != None):
 
-        data = get_career_df(player_id)
+        try:
+            data = pd.read_csv(f'NBA Datasets\\NBA Players Career Stats.csv')
+        except:
+            from datasets import get_career_df
+            data = get_career_df(player_id)
 
         mean = data[stat].mean()
 

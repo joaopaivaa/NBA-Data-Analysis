@@ -1,6 +1,8 @@
 from nba_api.stats.endpoints import leaguedashplayerstats, PlayerGameLogs, PlayerCareerStats
+from nba_api.stats.static import players
 import pandas as pd
 from datetime import date
+import time
 
 ####################################
 # games_df
@@ -55,7 +57,26 @@ def get_players_df(season):
 
 def get_career_df(player_id):
 
-    career = PlayerCareerStats(player_id=player_id, per_mode36='PerGame')
-    career_df = career.get_data_frames()[0]
+    all_players = players.get_players()
 
-    return career_df
+    players_stats = []
+
+    for player in all_players:
+        for attempt in range(3):
+            try:
+                player_id = player['id']
+                career = PlayerCareerStats(player_id=player_id, per_mode36='PerGame')
+                career_df = career.get_data_frames()[0]
+                career_df['player_name'] = player['full_name']
+                players_stats.append(career_df)
+                print(f"{player['full_name']} successfully processed")
+                time.sleep(0.5*attempt)
+                break
+            except Exception as e:
+                print(f"Try {attempt} Error to proccess player {player['full_name']}: {e}")
+
+    all_players_career_stats = pd.concat(players_stats, ignore_index=True)
+
+    all_players_career_stats.to_csv(f'NBA Datasets\\NBA Players Career Stats.csv')
+
+    return all_players_career_stats
